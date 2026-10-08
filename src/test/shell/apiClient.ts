@@ -38,11 +38,13 @@ async function request<T>(method: string, path: string, body?: unknown, options:
   if (options.idempotencyKey) headers.set("Idempotency-Key", options.idempotencyKey);
   let response: Response;
   try {
-    response = await fetch(url, { method, headers, body: body === undefined ? null : JSON.stringify(body), signal: options.signal ?? null });
-  } catch (cause) {
-    if (options.signal?.aborted) throw cause;
+    // jsdom's AbortSignal is not accepted by Node's fetch; the signal is honoured after the call
+    // instead, which is what the views observe (an aborted request never updates them).
+    response = await fetch(url, { method, headers, body: body === undefined ? null : JSON.stringify(body) });
+  } catch {
     throw new ApiError(0, "NETWORK", "", "");
   }
+  if (options.signal?.aborted) throw new DOMException("aborted", "AbortError");
   const text = response.status === 204 ? "" : await response.text();
   const parsed: unknown = text ? JSON.parse(text) : undefined;
   if (response.ok) return parsed as T;
