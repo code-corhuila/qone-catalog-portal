@@ -1,6 +1,12 @@
+import { http, HttpResponse } from "msw";
 import { catalogHandlers } from "./catalog";
 import { identityHandlers } from "./identity";
+import type { Msw } from "../msw";
 
-// The MSW handlers of qone-catalog-api (CA-01..CA-12), added with the screens that use them.
-// Fixtures are the seed of qone-catalog-db (06-data) and are validated against the contract.
-export const handlers = [...catalogHandlers, ...identityHandlers];
+// Every handler of the catalog portal, built with the given msw primitives (ADR-009).
+export function createHandlers(msw: Msw) {
+  return [...catalogHandlers(msw), ...identityHandlers(msw)];
+}
+
+/** The handlers for this portal's own tests (Node server in src/mocks/server.ts). */
+export const handlers = createHandlers({ http, HttpResponse });
