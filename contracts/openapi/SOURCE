@@ -1,0 +1,5 @@
+repository: code-corhuila/qone-docs
+ref: docs/api-v2-workflow-contract
+commit: c8ee932133f2f8aea201030c22c4f3d408ba8ef8
+synced: 2026-10-08T00:10:26Z
+files: _shared.yaml qone-catalog-api.yaml
