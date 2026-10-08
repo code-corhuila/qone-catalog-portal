@@ -13,7 +13,8 @@ const notify = () => listeners.forEach((l) => l());
 
 export const session = {
   isAuthenticated: () => current !== undefined,
-  user: () => current,
+  // Like the real shell: a fresh object on every call, so a component that forgets to cache its snapshot loops in tests too.
+  user: () => (current ? { ...current } : undefined),
   subscribe(listener: () => void): () => void {
     listeners.add(listener);
     return () => listeners.delete(listener);

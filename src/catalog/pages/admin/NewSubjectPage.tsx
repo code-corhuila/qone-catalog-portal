@@ -57,7 +57,7 @@ function NewSubjectForm() {
     try {
       const created = await catalogApi.createSubject(values, idempotency.key);
       idempotency.reset();
-      void navigate(`/${created.code}`);
+      void navigate(`../${created.code}`);
     } catch (cause) {
       const failure = failureOf(cause instanceof Error ? cause : new Error(String(cause)));
       const details = (cause as { details?: Array<{ field: string; message: string }> }).details ?? [];
@@ -88,7 +88,7 @@ function NewSubjectForm() {
   return (
     <section aria-labelledby={`${id}-title`}>
       <p>
-        <Link to="/">Back to subjects</Link>
+        <Link to="..">Back to subjects</Link>
       </p>
       <h3 id={`${id}-title`}>New subject</h3>
       <form onSubmit={submit} noValidate>

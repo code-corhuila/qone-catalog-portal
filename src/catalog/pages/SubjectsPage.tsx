@@ -20,7 +20,12 @@ export function SubjectsPage() {
       <h3 id="subjects-title">Subjects</h3>
       {user?.role === "ADMIN" ? (
         <p>
-          <Link to="/admin/subjects/new">New subject</Link>
+          <Link to="admin/subjects/new">New subject</Link> <Link to="admin/sections/new">Open a section</Link>
+        </p>
+      ) : null}
+      {user?.role === "PROFESSOR" ? (
+        <p>
+          <Link to="professor/sections">My sections</Link>
         </p>
       ) : null}
       <p>
@@ -75,7 +80,7 @@ export function SubjectsPage() {
               {state.data.data.map((s) => (
                 <tr key={s.id}>
                   <td>
-                    <Link to={`/${s.code}`}>{s.code}</Link>
+                    <Link to={s.code}>{s.code}</Link>
                   </td>
                   <td>{s.name}</td>
                   <td>{s.credits}</td>
