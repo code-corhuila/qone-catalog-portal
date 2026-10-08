@@ -80,7 +80,7 @@ function NewSectionForm() {
         idempotency.key,
       );
       idempotency.reset();
-      void navigate(`/${values.subjectCode}`);
+      void navigate(`../${values.subjectCode}`);
     } catch (cause) {
       const error = cause instanceof Error ? cause : new Error(String(cause));
       const details = (cause as { details?: Array<{ field: string; message: string }> }).details ?? [];
@@ -101,7 +101,7 @@ function NewSectionForm() {
   return (
     <section aria-labelledby={`${id}-title`}>
       <p>
-        <Link to="/">Back to subjects</Link>
+        <Link to="..">Back to subjects</Link>
       </p>
       <h3 id={`${id}-title`}>Open a section</h3>
       <p>Term {CURRENT_TERM}</p>

@@ -52,7 +52,7 @@ function MySections() {
             {state.data.data.map((s) => (
               <tr key={s.id}>
                 <td>
-                  <Link to={`/${s.subjectCode}`}>{s.subjectCode}</Link> {s.subjectName}
+                  <Link to={`../${s.subjectCode}`}>{s.subjectCode}</Link> {s.subjectName}
                 </td>
                 <td>Group {s.groupNumber}</td>
                 <td>{formatSlots(s.slots)}</td>
