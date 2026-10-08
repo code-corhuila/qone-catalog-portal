@@ -23,6 +23,11 @@ export function SubjectsPage() {
           <Link to="/admin/subjects/new">New subject</Link> <Link to="/admin/sections/new">Open a section</Link>
         </p>
       ) : null}
+      {user?.role === "PROFESSOR" ? (
+        <p>
+          <Link to="/professor/sections">My sections</Link>
+        </p>
+      ) : null}
       <p>
         <label htmlFor="semester-filter">Semester</label>{" "}
         <select
