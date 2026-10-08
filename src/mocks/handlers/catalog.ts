@@ -72,6 +72,30 @@ export const catalogHandlers = [
     return HttpResponse.json(paginate(rows, p.page, p.limit));
   }),
 
+  http.post("*/api/v1/catalog/sections", async ({ request }) => {
+    const unauthorized = requireToken(request);
+    if (unauthorized) return unauthorized;
+    const role = (request.headers.get("authorization") ?? "").slice(7).split(".")[1];
+    if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
+    const key = request.headers.get("idempotency-key") ?? "";
+    if (key.length < 8 || key.length > 128) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "Idempotency-Key", message: "header required, 8 to 128 characters" }]);
+    const body = (await request.json().catch(() => null)) as { subjectCode?: string; term?: string; groupNumber?: number; professorId?: string; professorName?: string; capacity?: number; slots?: Array<{ day: string; start: string; end: string }> } | null;
+    if (!body) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "body", message: "JSON object required" }]);
+    const subject = catalogFixtures.subjects.find((s) => s.code === body.subjectCode);
+    if (!subject) return envelope(404, "NOT_FOUND", "resource not found");
+    const details: Array<{ field: string; message: string }> = [];
+    if (!Number.isInteger(body.groupNumber) || (body.groupNumber ?? 0) < 1 || (body.groupNumber ?? 0) > 99) details.push({ field: "groupNumber", message: "must be between 1 and 99" });
+    if (!Number.isInteger(body.capacity) || (body.capacity ?? 0) < 1 || (body.capacity ?? 0) > 500) details.push({ field: "capacity", message: "must be between 1 and 500" });
+    if (!body.professorId || !body.professorName) details.push({ field: "professorId", message: "required" });
+    if (!Array.isArray(body.slots) || body.slots.length === 0) details.push({ field: "slots", message: "at least one slot" });
+    if (details.length) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", details);
+    if (catalogFixtures.sections.some((s) => s.subjectCode === body.subjectCode && s.term === body.term && s.groupNumber === body.groupNumber)) return envelope(422, "BUSINESS_RULE_VIOLATION", `group ${body.groupNumber} of ${body.subjectCode} already exists for ${body.term}`);
+    const slots = body.slots as Array<{ day: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT"; start: string; end: string }>;
+    const created = { id: crypto.randomUUID(), subjectCode: subject.code, subjectName: subject.name, term: body.term as string, groupNumber: body.groupNumber as number, professorId: body.professorId as string, professorName: body.professorName as string, capacity: body.capacity as number, seatsAvailable: body.capacity as number, slots, createdAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z") };
+    catalogFixtures.sections.push(created);
+    return HttpResponse.json(created, { status: 201, headers: { Location: `/api/v1/catalog/sections/${created.id}` } });
+  }),
+
   http.get("*/api/v1/catalog/sections/mine", ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
