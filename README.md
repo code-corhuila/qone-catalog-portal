@@ -38,6 +38,12 @@ npm run build               # remoteEntry.js and assets in dist/
 npm run check:isolation     # no gateway URL, no token handling, no raw fetch in dist/
 ```
 
+Container image and compose (`deploy/`, Annex H and G): `docker build -f deploy/Dockerfile -t
+qone-catalog-portal:dev .`, `docker run --rm -p 5002:80 qone-catalog-portal:dev`, then
+`deploy/smoke.sh http://localhost:5002`. NGINX serves `remoteEntry.js` to any origin without
+caching it and the hashed chunks as immutable; `deploy/compose.yml` is what `qone-infra` includes
+(port 5002 published only in `develop`).
+
 ## Dependencies
 
 - `qone-front` at `VITE_SHELL_URL`: `shell/apiClient`, `shell/session` and the mount point `/catalog/*`.
