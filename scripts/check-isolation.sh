@@ -7,7 +7,9 @@ DIST="${1:-dist}"
 # Only the portal's own chunks are judged: remoteEntry.js, the exposed module and its pages.
 # The federation runtime and the shared libraries (react, react-router) are the shell's
 # concern and are excluded by name.
-OWN=$(find "$DIST" -name '*.js' ! -name '_virtual_mf*' ! -name '__virtual_mf*' ! -name 'index-*'   ! -name 'hostInit-*' ! -name 'pendingShares-*' ! -name 'vite-preload-helper-*' ! -name 'mf-entry-bootstrap-*'   ! -name '_commonjsHelpers-*' ! -name 'mockServiceWorker.js')
+OWN=$(find "$DIST" -name '*.js' ! -name '_virtual_mf*' ! -name '__virtual_mf*' ! -name 'index-*'   ! -name 'hostInit-*' ! -name 'pendingShares-*' ! -name 'vite-preload-helper-*' ! -name 'mf-entry-bootstrap-*'   ! -name '_commonjsHelpers-*' ! -name 'mockServiceWorker.js' ! -name '*mocks*' ! -name 'remote-*')
+# The exposed ./mocks module (synthetic data for the shell's worker, ADR-009) reads the
+# Authorization header to emulate the services and is excluded: it never runs in production.
 [ -n "$OWN" ] || { echo "no portal chunks found in $DIST" >&2; exit 2; }
 fail=0
 # A gateway origin or API port baked into the bundle.
