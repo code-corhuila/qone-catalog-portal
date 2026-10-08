@@ -14,7 +14,7 @@ export function SubjectPage() {
   return (
     <section aria-labelledby="subject-title">
       <p>
-        <Link to="/">Back to subjects</Link>
+        <Link to="..">Back to subjects</Link>
       </p>
 
       {subject.status === "loading" ? <p role="status">Loading subject...</p> : null}
@@ -43,7 +43,7 @@ export function SubjectPage() {
               {subject.data.prerequisites.map((p, i) => (
                 <span key={p}>
                   {i > 0 ? ", " : ""}
-                  <Link to={`/${p}`}>{p}</Link>
+                  <Link to={`../${p}`}>{p}</Link>
                 </span>
               ))}
             </p>
