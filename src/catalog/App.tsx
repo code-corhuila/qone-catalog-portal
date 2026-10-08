@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router";
+import { NewSubjectPage } from "./pages/admin/NewSubjectPage";
 import { SubjectPage } from "./pages/SubjectPage";
 import { SubjectsPage } from "./pages/SubjectsPage";
 
@@ -11,6 +12,7 @@ export function App() {
       <h2 id="catalog-title">Catalog</h2>
       <Routes>
         <Route index element={<SubjectsPage />} />
+        <Route path="admin/subjects/new" element={<NewSubjectPage />} />
         <Route path=":code" element={<SubjectPage />} />
       </Routes>
     </section>
