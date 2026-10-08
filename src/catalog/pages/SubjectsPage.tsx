@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { catalogApi } from "../api/catalogApi";
 import { useRequest, failureOf } from "../hooks/useRequest";
+import { useSessionUser } from "../components/RequireRole";
 
 const PAGE_SIZE = 10;
 const SEMESTERS = [5, 6, 7];
@@ -12,10 +13,16 @@ export function SubjectsPage() {
   const [page, setPage] = useState(1);
   const [semester, setSemester] = useState<number | undefined>(undefined);
   const state = useRequest((signal) => catalogApi.listSubjects({ page, limit: PAGE_SIZE, ...(semester ? { semester } : {}) }, signal), [page, semester]);
+  const user = useSessionUser();
 
   return (
     <section aria-labelledby="subjects-title">
       <h3 id="subjects-title">Subjects</h3>
+      {user?.role === "ADMIN" ? (
+        <p>
+          <Link to="/admin/subjects/new">New subject</Link>
+        </p>
+      ) : null}
       <p>
         <label htmlFor="semester-filter">Semester</label>{" "}
         <select
