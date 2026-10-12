@@ -1,4 +1,5 @@
 import type { Msw } from "../msw";
+import { callerOf } from "../caller";
 import { identityFixtures } from "../fixtures/identity";
 
 // The one identity operation this portal uses: ID-05, the paginated users an ADMIN filters by
@@ -9,10 +10,9 @@ const envelope = (status: number, error: string, message: string) =>
 
 return [
   http.get("*/api/v1/identity/users", ({ request }) => {
-    const auth = request.headers.get("authorization") ?? "";
-    if (!auth.startsWith("Bearer ")) return envelope(401, "UNAUTHORIZED", "missing or invalid token");
-    const role = auth.slice(7).split(".")[1];
-    if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
+    const who = callerOf(request);
+    if (!who) return envelope(401, "UNAUTHORIZED", "missing or invalid token");
+    if (who.role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const url = new URL(request.url);
     const page = Number(url.searchParams.get("page") ?? "1");
     const limit = Number(url.searchParams.get("limit") ?? "20");
