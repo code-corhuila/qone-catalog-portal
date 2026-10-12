@@ -1,9 +1,10 @@
-import { http, HttpResponse } from "msw";
+import type { Msw } from "../msw";
 import { catalogFixtures, paginate } from "../fixtures/catalog";
 
 // MSW handlers of qone-catalog-api, read operations CA-01, CA-02, CA-04, CA-05, CA-06, CA-08
 // (writes and reservations arrive with their screens). Relative paths: they match whatever
 // gateway origin the shell is configured with. Errors use the common envelope.
+export function catalogHandlers({ http, HttpResponse }: Msw) {
 const envelope = (status: number, error: string, message: string, details?: Array<{ field: string; message: string }>) =>
   HttpResponse.json({ error, message, ...(details ? { details } : {}), traceId: crypto.randomUUID() }, { status });
 
@@ -17,7 +18,7 @@ function pageParams(url: URL): { page: number; limit: number } | ReturnType<type
 
 const requireToken = (request: Request) => (request.headers.get("authorization")?.startsWith("Bearer ") ? undefined : envelope(401, "UNAUTHORIZED", "missing or invalid token"));
 
-export const catalogHandlers = [
+return [
   http.get("*/api/v1/catalog/health", () => HttpResponse.json({ status: "ok", service: "qone-catalog-api", version: "2.0.0" })),
 
   http.get("*/api/v1/catalog/subjects", ({ request }) => {
@@ -114,3 +115,4 @@ export const catalogHandlers = [
     return section ? HttpResponse.json(section) : envelope(404, "NOT_FOUND", "resource not found");
   }),
 ];
+}
