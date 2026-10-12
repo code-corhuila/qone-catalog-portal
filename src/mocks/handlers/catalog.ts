@@ -1,4 +1,5 @@
 import type { Msw } from "../msw";
+import { callerOf } from "../caller";
 import { catalogFixtures, paginate } from "../fixtures/catalog";
 
 // MSW handlers of qone-catalog-api, read operations CA-01, CA-02, CA-04, CA-05, CA-06, CA-08
@@ -35,7 +36,7 @@ return [
   http.post("*/api/v1/catalog/subjects", async ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
-    const role = (request.headers.get("authorization") ?? "").slice(7).split(".")[1];
+    const role = callerOf(request)?.role;
     if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const key = request.headers.get("idempotency-key") ?? "";
     if (key.length < 8 || key.length > 128) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "Idempotency-Key", message: "header required, 8 to 128 characters" }]);
@@ -76,7 +77,7 @@ return [
   http.post("*/api/v1/catalog/sections", async ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
-    const role = (request.headers.get("authorization") ?? "").slice(7).split(".")[1];
+    const role = callerOf(request)?.role;
     if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const key = request.headers.get("idempotency-key") ?? "";
     if (key.length < 8 || key.length > 128) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "Idempotency-Key", message: "header required, 8 to 128 characters" }]);
@@ -100,8 +101,9 @@ return [
   http.get("*/api/v1/catalog/sections/mine", ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
-    // The stub token is "test-token.<ROLE>.<userId>"; a real token carries sub in its claims.
-    const [, role, userId] = (request.headers.get("authorization") ?? "").slice(7).split(".");
+    const who = callerOf(request);
+    const role = who?.role;
+    const userId = who?.userId;
     if (role !== "PROFESSOR") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const p = pageParams(new URL(request.url));
     if (p instanceof Response) return p;
