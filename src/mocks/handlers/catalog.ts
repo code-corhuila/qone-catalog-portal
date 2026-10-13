@@ -31,6 +31,28 @@ export const catalogHandlers = [
     return HttpResponse.json(paginate(rows, params.page, params.limit));
   }),
 
+  http.post("*/api/v1/catalog/subjects", async ({ request }) => {
+    const unauthorized = requireToken(request);
+    if (unauthorized) return unauthorized;
+    const role = (request.headers.get("authorization") ?? "").slice(7).split(".")[1];
+    if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
+    const key = request.headers.get("idempotency-key") ?? "";
+    if (key.length < 8 || key.length > 128) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "Idempotency-Key", message: "header required, 8 to 128 characters" }]);
+    const body = (await request.json().catch(() => null)) as { code?: string; name?: string; credits?: number; semester?: number; prerequisites?: string[] } | null;
+    const details: Array<{ field: string; message: string }> = [];
+    if (!body || typeof body.code !== "string" || !/^[A-Z0-9-]{3,10}$/.test(body.code)) details.push({ field: "code", message: "must match ^[A-Z0-9-]{3,10}$" });
+    if (!body || typeof body.name !== "string" || body.name.length < 2) details.push({ field: "name", message: "must have 2 to 120 characters" });
+    if (!body || !Number.isInteger(body.credits) || (body.credits ?? 0) < 1 || (body.credits ?? 0) > 10) details.push({ field: "credits", message: "must be between 1 and 10" });
+    if (!body || !Number.isInteger(body.semester) || (body.semester ?? 0) < 1 || (body.semester ?? 0) > 12) details.push({ field: "semester", message: "must be between 1 and 12" });
+    if (details.length || !body) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", details);
+    if (catalogFixtures.subjects.some((s) => s.code === body.code)) return envelope(422, "BUSINESS_RULE_VIOLATION", `INV-SUB-001: a subject with code ${body.code} already exists`);
+    const unknown = (body.prerequisites ?? []).find((p) => !catalogFixtures.subjects.some((s) => s.code === p));
+    if (unknown) return envelope(422, "BUSINESS_RULE_VIOLATION", `INV-SUB-002: prerequisite ${unknown} does not exist`);
+    const created = { id: crypto.randomUUID(), code: body.code as string, name: body.name as string, credits: body.credits as number, semester: body.semester as number, prerequisites: body.prerequisites ?? [], createdAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z") };
+    catalogFixtures.subjects.push(created);
+    return HttpResponse.json(created, { status: 201, headers: { Location: `/api/v1/catalog/subjects/${created.code}` } });
+  }),
+
   http.get("*/api/v1/catalog/subjects/:code", ({ request, params }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
