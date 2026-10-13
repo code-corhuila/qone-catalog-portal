@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router";
 import { NewSectionPage } from "./pages/admin/NewSectionPage";
 import { NewSubjectPage } from "./pages/admin/NewSubjectPage";
+import { MySectionsPage } from "./pages/professor/MySectionsPage";
 import { SubjectPage } from "./pages/SubjectPage";
 import { SubjectsPage } from "./pages/SubjectsPage";
 
@@ -15,6 +16,7 @@ export function App() {
         <Route index element={<SubjectsPage />} />
         <Route path="admin/subjects/new" element={<NewSubjectPage />} />
         <Route path="admin/sections/new" element={<NewSectionPage />} />
+        <Route path="professor/sections" element={<MySectionsPage />} />
         <Route path=":code" element={<SubjectPage />} />
       </Routes>
     </section>
