@@ -1,9 +1,11 @@
-import { http, HttpResponse } from "msw";
+import type { Msw } from "../msw";
+import { callerOf } from "../caller";
 import { catalogFixtures, paginate } from "../fixtures/catalog";
 
 // MSW handlers of qone-catalog-api, read operations CA-01, CA-02, CA-04, CA-05, CA-06, CA-08
 // (writes and reservations arrive with their screens). Relative paths: they match whatever
 // gateway origin the shell is configured with. Errors use the common envelope.
+export function catalogHandlers({ http, HttpResponse }: Msw) {
 const envelope = (status: number, error: string, message: string, details?: Array<{ field: string; message: string }>) =>
   HttpResponse.json({ error, message, ...(details ? { details } : {}), traceId: crypto.randomUUID() }, { status });
 
@@ -17,7 +19,7 @@ function pageParams(url: URL): { page: number; limit: number } | ReturnType<type
 
 const requireToken = (request: Request) => (request.headers.get("authorization")?.startsWith("Bearer ") ? undefined : envelope(401, "UNAUTHORIZED", "missing or invalid token"));
 
-export const catalogHandlers = [
+return [
   http.get("*/api/v1/catalog/health", () => HttpResponse.json({ status: "ok", service: "qone-catalog-api", version: "2.0.0" })),
 
   http.get("*/api/v1/catalog/subjects", ({ request }) => {
@@ -34,7 +36,7 @@ export const catalogHandlers = [
   http.post("*/api/v1/catalog/subjects", async ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
-    const role = (request.headers.get("authorization") ?? "").slice(7).split(".")[1];
+    const role = callerOf(request)?.role;
     if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const key = request.headers.get("idempotency-key") ?? "";
     if (key.length < 8 || key.length > 128) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "Idempotency-Key", message: "header required, 8 to 128 characters" }]);
@@ -75,7 +77,7 @@ export const catalogHandlers = [
   http.post("*/api/v1/catalog/sections", async ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
-    const role = (request.headers.get("authorization") ?? "").slice(7).split(".")[1];
+    const role = callerOf(request)?.role;
     if (role !== "ADMIN") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const key = request.headers.get("idempotency-key") ?? "";
     if (key.length < 8 || key.length > 128) return envelope(400, "VALIDATION_ERROR", "the request has invalid fields", [{ field: "Idempotency-Key", message: "header required, 8 to 128 characters" }]);
@@ -99,8 +101,9 @@ export const catalogHandlers = [
   http.get("*/api/v1/catalog/sections/mine", ({ request }) => {
     const unauthorized = requireToken(request);
     if (unauthorized) return unauthorized;
-    // The stub token is "test-token.<ROLE>.<userId>"; a real token carries sub in its claims.
-    const [, role, userId] = (request.headers.get("authorization") ?? "").slice(7).split(".");
+    const who = callerOf(request);
+    const role = who?.role;
+    const userId = who?.userId;
     if (role !== "PROFESSOR") return envelope(403, "FORBIDDEN", "this role may not perform the operation");
     const p = pageParams(new URL(request.url));
     if (p instanceof Response) return p;
@@ -114,3 +117,4 @@ export const catalogHandlers = [
     return section ? HttpResponse.json(section) : envelope(404, "NOT_FOUND", "resource not found");
   }),
 ];
+}
