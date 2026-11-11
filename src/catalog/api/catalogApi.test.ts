@@ -6,7 +6,7 @@ import { catalogApi } from "./catalogApi";
 
 // Core level: typed calls over shell/apiClient (stubbed in tests). Paths, query parameters and
 // the Idempotency-Key are the contract (qone-catalog-api.yaml); nothing here knows the gateway.
-beforeEach(() => testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Laura Gómez" }));
+beforeEach(() => testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Estudiante Demo 01" }));
 
 describe("catalogApi", () => {
   it("lists subjects as a page with data and meta (CA-02)", async () => {
@@ -54,7 +54,7 @@ describe("catalogApi", () => {
   });
 
   it("lists the professor's own sections (CA-07)", async () => {
-    testSession.signInAs({ id: catalogFixtures.professors.carlos.id, role: "PROFESSOR", name: "Carlos Ramírez" });
+    testSession.signInAs({ id: catalogFixtures.professors.professor01.id, role: "PROFESSOR", name: "Profesor Demo 01" });
 
     const mine = await catalogApi.mySections({ term: "2026-B" });
 
