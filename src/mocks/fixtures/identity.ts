@@ -20,10 +20,10 @@ const staff = (id: string, email: string, name: string, role: IdentityUser["role
 
 export const identityFixtures = {
   users: [
-    staff("22222222-2222-4222-8222-222222222221", "carlos.ramirez@uni.edu.co", "Carlos Ramírez", "PROFESSOR"),
-    staff("22222222-2222-4222-8222-222222222222", "ana.torres@uni.edu.co", "Ana Torres", "PROFESSOR"),
-    staff("22222222-2222-4222-8222-222222222223", "jorge.medina@uni.edu.co", "Jorge Medina", "PROFESSOR"),
-    staff("33333333-3333-4333-8333-333333333331", "admin@uni.edu.co", "Patricia Mora", "ADMIN"),
+    staff("22222222-2222-4222-8222-222222222221", "profesor.01@qampus.test", "Profesor Demo 01", "PROFESSOR"),
+    staff("22222222-2222-4222-8222-222222222222", "profesor.02@qampus.test", "Profesor Demo 02", "PROFESSOR"),
+    staff("22222222-2222-4222-8222-222222222223", "profesor.03@qampus.test", "Profesor Demo 03", "PROFESSOR"),
+    staff("33333333-3333-4333-8333-333333333331", "admin@qampus.test", "Administrador", "ADMIN"),
   ],
   page(role: string | null, page: number, limit: number): Page<IdentityUser> {
     return paginate(identityFixtures.users.filter((u) => (role ? u.role === role : true)), page, limit);
