@@ -17,7 +17,7 @@ function renderPage(path = "/") {
   );
 }
 
-beforeEach(() => testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Laura Gómez" }));
+beforeEach(() => testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Estudiante Demo 01" }));
 
 // HU-CAT-003: browse the catalog. Annex H: the four states, a newer request replaces the older.
 describe("SubjectsPage", () => {

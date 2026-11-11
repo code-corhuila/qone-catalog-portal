@@ -22,7 +22,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
   await user.selectOptions(await screen.findByLabelText("Subject"), "ISW-702");
   await user.clear(screen.getByLabelText("Group number"));
   await user.type(screen.getByLabelText("Group number"), "1");
-  await user.selectOptions(await screen.findByLabelText("Professor"), catalogFixtures.professors.ana.id);
+  await user.selectOptions(await screen.findByLabelText("Professor"), catalogFixtures.professors.professor02.id);
   await user.clear(screen.getByLabelText("Capacity"));
   await user.type(screen.getByLabelText("Capacity"), "25");
   await user.selectOptions(screen.getByLabelText("Day of block 1"), "MON");
@@ -32,7 +32,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("End of block 1"), "16:00");
 }
 
-beforeEach(() => testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Patricia Mora" }));
+beforeEach(() => testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Administrador" }));
 
 // HU-CAT-002: an ADMIN opens a section with professor, capacity and schedule. The professor
 // comes from identity (ID-05, through the shell's client) and is sent as a snapshot
@@ -43,7 +43,7 @@ describe("NewSectionPage", () => {
 
     expect(within(await screen.findByLabelText("Subject")).getAllByRole("option")).toHaveLength(15);
     const professors = await screen.findByLabelText("Professor");
-    expect(within(professors).getAllByRole("option").map((o) => o.textContent)).toEqual(["Choose a professor", "Carlos Ramírez", "Ana Torres", "Jorge Medina"]);
+    expect(within(professors).getAllByRole("option").map((o) => o.textContent)).toEqual(["Choose a professor", "Profesor Demo 01", "Profesor Demo 02", "Profesor Demo 03"]);
     expect(screen.getByText("Term 2026-B")).toBeInTheDocument();
     expect(screen.getByLabelText("Day of block 1")).toBeInTheDocument();
   });
@@ -90,8 +90,8 @@ describe("NewSectionPage", () => {
       subjectCode: "ISW-702",
       term: "2026-B",
       groupNumber: 1,
-      professorId: catalogFixtures.professors.ana.id,
-      professorName: "Ana Torres",
+      professorId: catalogFixtures.professors.professor02.id,
+      professorName: "Profesor Demo 02",
       capacity: 25,
       slots: [{ day: "MON", start: "14:00", end: "16:00" }],
     });

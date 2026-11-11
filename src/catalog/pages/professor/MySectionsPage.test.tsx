@@ -23,7 +23,7 @@ function renderPage() {
 // linked from here.
 describe("MySectionsPage", () => {
   it("lists the professor's sections with subject, group, schedule and occupancy", async () => {
-    testSession.signInAs({ id: catalogFixtures.professors.carlos.id, role: "PROFESSOR", name: "Carlos Ramírez" });
+    testSession.signInAs({ id: catalogFixtures.professors.professor01.id, role: "PROFESSOR", name: "Profesor Demo 01" });
     renderPage();
     expect(screen.getByRole("status")).toHaveTextContent("Loading your sections");
 
@@ -47,14 +47,14 @@ describe("MySectionsPage", () => {
   });
 
   it("shows the permission notice to a student", () => {
-    testSession.signInAs({ id: "s-1", role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: "s-1", role: "STUDENT", name: "Estudiante Demo 01" });
     renderPage();
 
     expect(screen.getByRole("alert")).toHaveTextContent("You do not have permission for this section.");
   });
 
   it("shows the error with the traceId and retries", async () => {
-    testSession.signInAs({ id: catalogFixtures.professors.ana.id, role: "PROFESSOR", name: "Ana Torres" });
+    testSession.signInAs({ id: catalogFixtures.professors.professor02.id, role: "PROFESSOR", name: "Profesor Demo 02" });
     server.use(http.get("*/api/v1/catalog/sections/mine", () => HttpResponse.json({ error: "INTERNAL_ERROR", message: "x", traceId: "t-8" }, { status: 500 }), { once: true }));
     const user = userEvent.setup();
     renderPage();
