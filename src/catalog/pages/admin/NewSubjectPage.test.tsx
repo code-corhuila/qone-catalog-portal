@@ -26,7 +26,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Semester"), "8");
 }
 
-beforeEach(() => testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Patricia Mora" }));
+beforeEach(() => testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Administrador" }));
 
 // HU-CAT-001: an ADMIN creates a subject with prerequisites. Annex H form rules: label per
 // field, error beside the field (aria-describedby), button disabled while pending, one

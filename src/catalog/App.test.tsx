@@ -7,7 +7,7 @@ import { App } from "./App";
 // the subjects list (HU-CAT-003).
 describe("catalog App", () => {
   it("renders the catalog heading and the subjects list on its index route", async () => {
-    testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Estudiante Demo 01" });
     render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
@@ -19,7 +19,7 @@ describe("catalog App", () => {
   });
 
   it("keeps every link under the shell's mount point when mounted at /catalog/* (admin)", async () => {
-    testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Patricia Mora" });
+    testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Administrador" });
     render(
       <MemoryRouter initialEntries={["/catalog"]}>
         <Routes>
@@ -34,7 +34,7 @@ describe("catalog App", () => {
   });
 
   it("resolves the detail's back and prerequisite links under /catalog as well", async () => {
-    testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Estudiante Demo 01" });
     render(
       <MemoryRouter initialEntries={["/catalog/ISW-604"]}>
         <Routes>

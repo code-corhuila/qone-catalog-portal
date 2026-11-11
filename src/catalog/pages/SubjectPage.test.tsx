@@ -15,7 +15,7 @@ function renderPage(code: string) {
   );
 }
 
-beforeEach(() => testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Laura Gómez" }));
+beforeEach(() => testSession.signInAs({ id: "11111111-1111-4111-8111-111111111111", role: "STUDENT", name: "Estudiante Demo 01" }));
 
 // HU-CAT-003: a subject with its prerequisites and the sections of the term with seats and schedule.
 describe("SubjectPage", () => {
@@ -31,7 +31,7 @@ describe("SubjectPage", () => {
     const rows = within(table).getAllByRole("row").slice(1);
     expect(rows).toHaveLength(3);
     expect(rows[0]).toHaveTextContent("Group 1");
-    expect(rows[0]).toHaveTextContent("Carlos Ramírez");
+    expect(rows[0]).toHaveTextContent("Profesor Demo 01");
     expect(rows[0]).toHaveTextContent("MON 08:00-10:00, WED 08:00-10:00");
     expect(within(rows[0]!).getByText("27 seats")).toBeInTheDocument();
     expect(within(rows[2]!).getByText("Full")).toBeInTheDocument();
